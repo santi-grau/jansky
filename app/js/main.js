@@ -1,12 +1,14 @@
-var SimplexNoise = require('simplex-noise');
+// var SimplexNoise = require('simplex-noise');
 window.THREE = require('three');
+
+var TapTempo = require('./TapTempo');
 var Letters = require('./Letters');
 var Body = require('./Body');
+var Controller = require('./Controller');
 
 var Main = function( ) {
 	this.node = document.getElementById('main');
 	
-	this.simplex = new SimplexNoise( Math.random );
 	this.time = 0;
 	this.timeInc = 0.01;
 	this.sides = 8;
@@ -17,27 +19,30 @@ var Main = function( ) {
 	this.renderer = new THREE.WebGLRenderer( { alpha : true, antialias : true } );
 	this.node.appendChild( this.renderer.domElement );
 
+	this.tapTempo = new TapTempo();
 	this.letters = new Letters( this.node.offsetWidth * 2, this.fontSize * 4 );
 	this.body = new Body( this.letters, this.node.offsetWidth, this.letters.fontSize );
-	
+	this.controller = new Controller( this.letters, this.body, this.tapTempo );
+
 	this.scene.add( this.body );
 
+	window.addEventListener( 'keypress', this.keyPress.bind( this ) );
 	window.addEventListener( 'resize', this.resize.bind( this ) );
 
-	setInterval( function(){
-		this.letters.updateTrack( -1 + Math.random() * 2 );
-		this.letters.updateRotation( -1 + Math.random() * 2 );
-		this.body.updateLineHeight( -1 + Math.random() * 2 );
-		this.body.updateLineOffset( -1 + Math.random() * 2 );
-	}.bind( this ), 400);
 	this.resize();
 	this.step();
+}
+
+Main.prototype.keyPress = function( e ){
+	if( e.charCode == 32 ) this.tapTempo.tap();
+	if( e.charCode == 109 ) this.tapTempo.resetCount();
 }
 
 Main.prototype.resize = function( e ) {
 	var width = this.node.offsetWidth, height = this.node.offsetHeight;
 
 	this.letters.resize( width, height );
+	this.body.resize( width, height );
 
 	var camView = { left :  width / -2, right : width / 2, top : height / 2, bottom : height / -2 };
 	for ( var prop in camView) this.camera[ prop ] = camView[ prop ];
@@ -51,12 +56,10 @@ Main.prototype.resize = function( e ) {
 Main.prototype.step = function( time ) {
 	window.requestAnimationFrame( this.step.bind( this ) );
 
+	this.controller.step( time );
+	this.tapTempo.step( time );
+
 	this.time += this.timeInc;
-	var n = this.simplex.noise2D( 0.5, this.time );
-
-	// this.letters.updateTrack( 1 );
-	// this.letters.updateRotation( -0.1 );
-
 	this.renderer.render( this.letters.scene, this.letters.camera, this.letters, true );
 	this.renderer.render( this.scene, this.camera );
 };
