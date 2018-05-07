@@ -30,7 +30,7 @@ TapTempo.prototype.resetCount = function(){
 	}
 	if( this.beatTween ) this.beatTween.kill();
 	this.beatTween = TweenMax.to( this.tics, 60 / this.bpmAvg , { beat : 1, repeat : -1, onRepeat : this.tic.bind( this ) } );
-	console.log('here', 'beat 0')
+	// console.log('here', 'beat 0')
 }
 
 TapTempo.prototype.tapEnd = function(){
@@ -67,11 +67,10 @@ TapTempo.prototype.tap = function(){
 TapTempo.prototype.tic = function(){
 	if( this.beatCount < 15 )this.beatCount++;
 	else this.beatCount = 0;
-	// console.log('beat ' + this.beatCount );
 	this.emit( 'beat' );
-	// if( this.beatCount == 0 ) console.log('fourbar');
-	// if( this.beatCount % 4 == 0 ) console.log('bar');
-	// if( this.beatCount % 2 == 0 ) console.log('semibar');
+	if( this.beatCount == 0 ) this.emit( 'fourbar' );
+	if( this.beatCount % 4 ) this.emit( 'bar' );
+	if( this.beatCount % 2 ) this.emit( 'semibar' );
 }
 
 TapTempo.prototype.step = function( time ){
