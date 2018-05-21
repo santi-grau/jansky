@@ -27,7 +27,8 @@
     "simplex-noise": "^2.4.0",
     "stringify": "*",
     "stylus": "*",
-    "three": "^0.92.0"
+    "three": "^0.92.0",
+    "three-effectcomposer": "0.0.1"
   },
   "devDependencies": {
     "body-parser": "^1.17.1",

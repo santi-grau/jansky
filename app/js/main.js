@@ -1,6 +1,8 @@
 window.THREE = require('three');
+var EffectComposer = require('three-effectcomposer')(THREE)
 
-
+var baseVs = require('./../shaders/base.vs');
+var rgbShiftFs = require('./../shaders/rgbShift.fs');
 // var xp = JSON.parse( require('./../img/export/export.json') );
 // console.log(xp);
 
@@ -11,6 +13,16 @@ window.THREE = require('three');
 // }
 
 // console.log( JSON.stringify(glyphs) );
+
+THREE.RGBShiftShader = {
+  uniforms: {
+    "tDiffuse": { type: "t", value: null },
+    "amount":   { type: "f", value: 0.001 },
+    "angle":    { type: "f", value: 0.0 }
+  },
+  vertexShader: baseVs,
+  fragmentShader: rgbShiftFs
+};
 
 var Input = require('./input');
 var TapTempo = require('./TapTempo');
@@ -43,6 +55,23 @@ var Main = function( ) {
 
 	this.scene.add( this.body );
 
+
+
+	// Create your composer and first RenderPass
+	this.composer = new EffectComposer( this.renderer );
+	this.composer.addPass(new EffectComposer.RenderPass( this.scene, this.camera ) );
+
+	this.tapTempo.on( 'beat', this.beat.bind( this ) );
+	// Redraw with a shader
+	// var effect = new EffectComposer.ShaderPass( THREE.DotScreenShader );
+	// this.composer.addPass( effect );
+
+	// And another shader, drawing to the screen at this point
+	var effect = new EffectComposer.ShaderPass( THREE.RGBShiftShader );
+	effect.uniforms.amount.value = 0.1
+	effect.renderToScreen = true;
+	this.composer.addPass( effect );
+
 	window.addEventListener( 'keydown', this.keyDown.bind( this ) );
 	window.addEventListener( 'resize', this.resize.bind( this ) );
 
@@ -51,13 +80,15 @@ var Main = function( ) {
 }
 
 Main.prototype.keyDown = function( e ){
-	console.log(e.keyCode)
-
 	if( e.keyCode == 37 ) this.input.prevWord(); // left
 	if( e.keyCode == 39 ) this.input.nextWord(); // right
 	if( e.keyCode == 18 ) this.input.switch(); // alt
 	if( e.keyCode == 32 ) this.tapTempo.tap(); // spacebar
 	if( e.keyCode == 109 ) this.tapTempo.resetCount(); // m
+}
+
+Main.prototype.beat = function( ){
+	this.composer.passes[1].uniforms.amount.value = Math.random() / 10;
 }
 
 Main.prototype.nextWord = function( ){
@@ -87,7 +118,8 @@ Main.prototype.step = function( time ) {
 
 	this.time += this.timeInc;
 	this.renderer.render( this.letters.scene, this.letters.camera, this.letters, true );
-	this.renderer.render( this.scene, this.camera );
+	// this.renderer.render( this.scene, this.camera );
+	this.composer.render()
 };
 
 var root = new Main();

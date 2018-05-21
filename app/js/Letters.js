@@ -25,8 +25,6 @@ Letters.prototype.resize = function( width, height ){
 
 Letters.prototype.updateWord = function( string ){
 
-	console.log(string)
-
 	var string = string.split('');
 
 	for( var i = this.group.children.length ; i >= 0 ; i-- ) this.group.remove( this.group.children[ i ] );
@@ -35,8 +33,6 @@ Letters.prototype.updateWord = function( string ){
 	for( var i = 0 ; i < string.length ; i++ ){
 		var chr = string[ i ].charCodeAt( 0 );
 		if( string[ i ].charCodeAt( 0 ) > 128 ) chr =  ( -256 + chr );
-		console.log( string[ i ].charCodeAt( 0 ), chr );
-		
 		var ls = letters.glyphs[ 'g' + chr ];
 		var scale = this.fontSize / letters.info.size; 
 		var geometry = new THREE.PlaneBufferGeometry( ls.width * scale, ls.height * scale );
@@ -57,7 +53,6 @@ Letters.prototype.updateWord = function( string ){
 	}
 
 	this.group.position.set( -this.stdWidth / 2, -max / 2, 0 );
-
 }
 
 Letters.prototype.updateTrack = function( n ){

@@ -1,5 +1,3 @@
-
-
 var Controller = function( letters, body, tapTempo ){
 	this.tapTempo = tapTempo;
 	this.letters = letters;
