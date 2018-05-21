@@ -42,8 +42,8 @@ Letters.prototype.updateWord = function( string ){
 				tex : { value : this.txtr }
 			},
 			transparent : true,
-			vertexShader: require('./letter.vs'),
-			fragmentShader: require('./letter.fs')
+			vertexShader: require('./../shaders/letter.vs'),
+			fragmentShader: require('./../shaders/letter.fs')
 		});
 		max = Math.max( max, ls.height * scale );
 		var plane = new THREE.Mesh( geometry, material );

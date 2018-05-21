@@ -17,7 +17,7 @@ var rgbShiftFs = require('./../shaders/rgbShift.fs');
 THREE.RGBShiftShader = {
   uniforms: {
     "tDiffuse": { type: "t", value: null },
-    "amount":   { type: "f", value: 0.001 },
+    "amount":   { type: "f", value: 0.0 },
     "angle":    { type: "f", value: 0.0 }
   },
   vertexShader: baseVs,
@@ -60,7 +60,7 @@ var Main = function( ) {
 	// Create your composer and first RenderPass
 	this.composer = new EffectComposer( this.renderer );
 	this.composer.addPass(new EffectComposer.RenderPass( this.scene, this.camera ) );
-
+	console.log(this.composer)
 	this.tapTempo.on( 'beat', this.beat.bind( this ) );
 	// Redraw with a shader
 	// var effect = new EffectComposer.ShaderPass( THREE.DotScreenShader );
@@ -68,7 +68,6 @@ var Main = function( ) {
 
 	// And another shader, drawing to the screen at this point
 	var effect = new EffectComposer.ShaderPass( THREE.RGBShiftShader );
-	effect.uniforms.amount.value = 0.1
 	effect.renderToScreen = true;
 	this.composer.addPass( effect );
 
@@ -88,7 +87,7 @@ Main.prototype.keyDown = function( e ){
 }
 
 Main.prototype.beat = function( ){
-	this.composer.passes[1].uniforms.amount.value = Math.random() / 10;
+	// this.composer.passes[1].uniforms.amount.value = Math.random() / 10;
 }
 
 Main.prototype.nextWord = function( ){
@@ -105,9 +104,10 @@ Main.prototype.resize = function( e ) {
 	for ( var prop in camView) this.camera[ prop ] = camView[ prop ];
 	this.camera.position.z = 1000;
 	this.camera.updateProjectionMatrix( );
-	
+
 	this.renderer.setSize( width * 2, height * 2 );
 	this.renderer.domElement.setAttribute( 'style', 'width:' + width + 'px; height:' + height + 'px;' );
+
 }
 
 Main.prototype.step = function( time ) {
