@@ -11,7 +11,6 @@ var Body = function( fbo, width, height ){
 		for( var i = 0 ; i < this.rows + 1 ; i++ ){
 			var plane = new THREE.Mesh( geometry, material );
 			group.add( plane );
-			// plane.position.x =  i * 30;
 			plane.position.y = 200;
 		}
 		group.rotation.z = h / this.sides * Math.PI * 2;

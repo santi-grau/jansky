@@ -5,9 +5,16 @@ $ npm start
 
 $ npm build
 
-# variations
+[ ] BPM reader
+[ ] OSC connect
+[ ] Composer
 
-* BW
 * Zoom in/out
 * Post process
+	* RGB Shift
+	* Noise
+	* Glitch
+	* Invert
+	* Chromatic aberration
+* Multiwords
 * Group rotation
