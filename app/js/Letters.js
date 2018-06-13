@@ -5,7 +5,7 @@ var Letters = function( ){
 	this.scene = new THREE.Scene();
 	this.camera = new THREE.OrthographicCamera();
 
-	this.fontSize = 13;
+	this.fontSize = this.height / 4;
 	this.stdWidth = Math.sin( 22.5 * Math.PI / 180 ) * 200 * 2;
 
 	this.group = new THREE.Object3D();
@@ -70,10 +70,6 @@ Letters.prototype.updateTrack = function( n ){
 	}
 	var dif = child[child.length-1].position.x - child[0].position.x;
 	this.group.position.x = -dif / 2;
-}
-
-Letters.prototype.updateRotation = function( n ){
-	for( var i = 0 ; i < this.group.children.length ; i++ ) this.group.children[ i ].rotation.z = Math.PI * 0.2 * n;
 }
 
 module.exports = Letters;

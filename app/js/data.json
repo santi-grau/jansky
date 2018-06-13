@@ -1,38 +1,38 @@
 [
 	{
 		"song" : "MUSTELA MUSTELA",
-		"bpm" : 90
+		"bpm" : 127
 	},
 	{
 		"song" : "PALPENTES",
-		"bpm" : 90
+		"bpm" : 100
 	},
 	{
 		"song" : "LANGUAGE",
-		"bpm" : 90
+		"bpm" : 120
 	},
 	{
 		"song" : "PRIMERA LLIÇÓ",
-		"bpm" : 90
+		"bpm" : 110
 	},
 	{
 		"song" : "GENETS",
-		"bpm" : 90
+		"bpm" : 115
 	},
 	{
 		"song" : "ÉSSER ELÈCTRIC",
-		"bpm" : 90
+		"bpm" : 125
 	},
 	{
 		"song" : "COMMEDIA",
-		"bpm" : 90
+		"bpm" : 137
 	},
 	{
 		"song" : "LA MASOVERA SE'N VA A L'ESPAI",
-		"bpm" : 90
+		"bpm" : 135
 	},
 	{
 		"song" : "PORS SÓN FLORS",
-		"bpm" : 90
+		"bpm" : 130
 	}
 ]

@@ -1,4 +1,5 @@
 uniform sampler2D tDiffuse;
+uniform sampler2D noise;
 uniform float time;
 varying vec2 vUv;
 
@@ -14,8 +15,8 @@ void main(){
 	vec2 uv_r = uv, uv_g = uv, uv_b = uv;
 
 	// glitch some blocks and lines
-	if (texture2D(tDiffuse, uv_noise).r < block_thresh ||
-		texture2D(tDiffuse, vec2(uv_noise.y, 0.0)).g < line_thresh) {
+	if (texture2D(noise, uv_noise).r < block_thresh ||
+		texture2D(noise, vec2(uv_noise.y, 0.0)).g < line_thresh) {
 
 		vec2 dist = (fract(uv_noise) - 0.5) * 0.3;
 		uv_r += dist * 0.1;
@@ -28,14 +29,14 @@ void main(){
 	gl_FragColor.b = texture2D(tDiffuse, uv_b).b;
 
 	// loose luma for some blocks
-	if (texture2D(tDiffuse, uv_noise).g < block_thresh) gl_FragColor.rgb = gl_FragColor.ggg;
+	if (texture2D(noise, uv_noise).g < block_thresh) gl_FragColor.rgb = gl_FragColor.ggg;
 
 	// discolor block lines
-	// if (texture2D(tDiffuse, vec2(uv_noise.y, 0.0)).b * 3.5 < line_thresh) gl_FragColor.rgb = vec3(0.0, dot(gl_FragColor.rgb, vec3(1.0)), 0.0);
+	if (texture2D(tDiffuse, vec2(uv_noise.y, 0.0)).b * 3.5 < line_thresh) gl_FragColor.rgb = vec3(0.0, dot(gl_FragColor.rgb, vec3(1.0)), 0.0);
 
 	// interleave lines in some blocks
-	if (texture2D(tDiffuse, uv_noise).g * 1.5 < block_thresh ||
-		texture2D(tDiffuse, vec2(uv_noise.y, 0.0)).g * 2.5 < line_thresh) {
+	if (texture2D(noise, uv_noise).g * 1.5 < block_thresh ||
+		texture2D(noise, vec2(uv_noise.y, 0.0)).g * 2.5 < line_thresh) {
 		float line = fract(gl_FragCoord.y / 3.0);
 		vec3 mask = vec3(3.0, 0.0, 0.0);
 		if (line > 0.333)

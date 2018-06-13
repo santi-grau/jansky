@@ -1,5 +1,5 @@
 uniform sampler2D tDiffuse;
-uniform float seed;
+uniform float time;
 varying vec2 vUv;
 
 // ┌────────────────────────────────────────────────────────────────────┐
@@ -35,7 +35,8 @@ float snoise(vec2 v) {
 
 void main(){
 	vec4 col = texture2D( tDiffuse, vUv );
-	float n = snoise( vec2( vUv.x * 1000.0 * seed, vUv.y * 1000.0 ) );
+	float n = ( snoise( vec2( vUv.x * 1000.0 + time * 1000.0, vUv.y * 1000.0 - (1.0 - time) * 1000.0 ) ) + 1.0 ) / 2.0;
+	if( n > 0.05 && n < 0.95 ) n = col.x;
 
-	gl_FragColor = vec4( col.xyz * n, 1.0 );
+	gl_FragColor = vec4( vec3( n ), 1.0 );
 }

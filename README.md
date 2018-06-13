@@ -11,7 +11,7 @@ $ npm build
 
 * Zoom in/out
 * Post process
-	* RGB Shift
+	* RG Shift
 	* Noise
 	* Glitch
 	* Invert

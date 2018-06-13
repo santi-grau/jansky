@@ -1,15 +1,45 @@
-var Body = function( fbo, width, height ){
-	THREE.Object3D.apply(this, arguments);
+var Letters = require('./Letters');
+var SimplexNoise = require('simplex-noise');
+var Gsap = require('gsap');
 
-	this.rows = 8;
+var Body = function( controller, settings ){
+	THREE.Object3D.apply(this, arguments);
+	this.controller = controller;
+
+	this.time = 0;
+	this.timeInc = 1;
+
+	this.controller.on( 'beat', this.beat.bind( this ) );
+	this.controller.on( 'bar', this.bar.bind( this ) );
+	this.controller.on( 'fourbar', this.fourbar.bind( this ) );
+
+	this.settings = settings || {};
+
+	this.simplex = new SimplexNoise( Math.random );
+
+	this.rotationStatus = new THREE.Vector3( Math.round( Math.random() ) * 2 - 1 , Boolean( Math.round( Math.random() ) ), Math.floor( Math.random() * 3 ) ); // direction, active, type --> 0 Beat | 1 bar | 4 fourbar
+
+	this.track = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 ); // value, divisor, count, mode -> 0 fluid | 1 step | 2 random
+	this.height = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 );
+	this.offset = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 );
+	
+	var width = document.body.offsetWidth;
+	var height = this.settings.fontSize;
+	this.letters = new Letters( width * 2, height * 4, { fontSize : this.settings.fontSize } ); // THREE.WebGLRenderTarget
+	this.letters.updateWord( this.settings.word );
+
+	this.rows = 40;
+	this.rowCount = 8;
 	this.sides = 8;
-	var geometry = new THREE.PlaneBufferGeometry( 1, height  );
-	var material = new THREE.MeshBasicMaterial( { map : fbo.texture, transparent : true } );
+
+	var geometry = new THREE.PlaneBufferGeometry( 1, height );
+	var material = new THREE.MeshBasicMaterial( { map : this.letters.texture, transparent : true } );
 
 	for( var h = 0 ; h < this.sides + 1 ; h++ ){
 		var group = new THREE.Object3D();
 		for( var i = 0 ; i < this.rows + 1 ; i++ ){
 			var plane = new THREE.Mesh( geometry, material );
+			if( i > this.rowCount ) plane.visible = false;
 			group.add( plane );
 			plane.position.y = 200;
 		}
@@ -17,40 +47,79 @@ var Body = function( fbo, width, height ){
 		this.add( group );
 	}
 
+	this.beat();
+	this.bar();
+	this.fourbar();
+
 	this.resize( width, height );
 }
 
 Body.prototype = Object.create(THREE.Object3D.prototype);
 Body.prototype.constructor = Body;
 
+Body.prototype.beat = function( ){
+	if( this.rotationStatus.y && this.rotationStatus.z == 0 ) TweenLite.to( this.rotation, this.controller.bpms / 1000 * 0.99, { z : this.rotation.z + Math.PI * 2 / this.sides * this.rotationStatus.x });
+
+	if( this.track.w == 1 ) this.letters.updateTrack( this.track.x );
+	if( this.height.w == 1 ) this.updateLineHeight( this.height.x );
+	if( this.offset.w == 1 ) this.updateLineOffset( this.offset.x );
+
+	if( this.track.w == 2 ) this.letters.updateTrack( Math.random() * 2 - 1 );
+	if( this.height.w == 2 ) this.updateLineHeight( Math.random() * 2 - 1 );
+	if( this.offset.w == 2 ) this.updateLineOffset( Math.random() * 2 - 1 );
+}
+
+Body.prototype.bar = function( ){
+	if( this.rotationStatus.y && this.rotationStatus.z == 1 ) TweenLite.to( this.rotation, this.controller.bpms / 1000 * 3.99, { z : this.rotation.z + Math.PI * 2 * this.rotationStatus.x });
+}
+
+Body.prototype.fourbar = function( ){
+
+
+	this.rotationStatus = new THREE.Vector3( Math.round( Math.random() ) * 2 - 1 , Boolean( Math.round( Math.random() ) ), Math.floor( Math.random() * 3 ) ); // direction, active, type --> 0 Beat | 1 bar | 4 fourbar
+
+	if( this.rotationStatus.y && this.rotationStatus.z == 2 ) TweenLite.to( this.rotation, this.controller.bpms / 1000 * 15.99999, { z : this.rotation.z + Math.PI * 2 * this.rotationStatus.x, ease : Power0.easeNone });
+
+	if( this.track.w == 2 ) this.track.y = 50 + Math.random() * 450;
+	if( this.height.w == 2 ) this.height.y = 50 + Math.random() * 450;
+	if( this.offset.w == 2 ) this.offset.y = 50 + Math.random() * 450;
+
+	this.track.w = Math.floor( Math.random() * 3 );
+	this.height.w = Math.floor( Math.random() * 3 );
+	this.offset.w = Math.floor( Math.random() * 3 );
+}
+
 Body.prototype.resize = function( width, height ){
-	for( var i = 0 ; i < this.children.length ; i++ ) {
-		var column = this.children[i];
-		for( var j = 0 ; j < column.children.length ; j++ ){
-			var line = column.children[ j ];
-			line.scale.x = width;
-		}
-	}
+	this.letters.resize( width, height );
+	var c = this.children;
+	for( var i = 0 ; i < c.length ; i++ ) for( var j = 0 ; j < c[i].children.length ; j++ ) c[i].children[ j ].scale.x = width;
+}
+
+Body.prototype.updateWord = function( string ){
+	this.letters.updateWord( string );
 }
 
 Body.prototype.updateLineHeight = function( n ){
-	for( var i = 0 ; i < this.children.length ; i++ ) {
-		var column = this.children[i];
-		for( var j = 0 ; j < column.children.length ; j++ ){
-			var line = column.children[ j ];
-			line.position.y = 200 - j * ( n * 30 )
-		}
-	}
+	var c = this.children;
+	for( var i = 0 ; i < c.length ; i++ ) for( var j = 0 ; j < c[i].children.length ; j++ ) c[i].children[ j ].position.y = 200 - j * ( n * 30 );
 }
 
 Body.prototype.updateLineOffset = function( n ){
-	for( var i = 0 ; i < this.children.length ; i++ ) {
-		var column = this.children[i];
-		for( var j = 0 ; j < column.children.length ; j++ ){
-			var line = column.children[ j ];
-			line.position.x = j * ( n * 5 )
-		}
-	}
+	var c = this.children;
+	for( var i = 0 ; i < c.length ; i++ ) for( var j = 0 ; j < c[i].children.length ; j++ ) c[i].children[ j ].position.x = j * ( n * 5 );
+}
+
+Body.prototype.step = function( time, renderer ){
+	renderer.render( this.letters.scene, this.letters.camera, this.letters, true );
+	this.time += this.timeInc;
+
+	this.track.x = this.simplex.noise3D( 0.9, 0.3, this.track.z++ / this.track.y );
+	this.height.x = this.simplex.noise3D( 0.3, 0.2, this.height.z++ / this.height.y );
+	this.offset.x = this.simplex.noise3D( 0.1, 0.8, this.offset.z++ / this.offset.y );
+
+	if( this.track.w == 0 ) this.letters.updateTrack( this.track.x );
+	if( this.height.w == 0 ) this.updateLineHeight( this.height.x );
+	if( this.offset.w == 0 ) this.updateLineOffset( this.offset.x );
 }
 
 module.exports = Body;

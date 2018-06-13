@@ -7,5 +7,6 @@ void main() {
 	vec4 cr = texture2D(tDiffuse, vUv + offset);
 	vec4 cga = texture2D(tDiffuse, vUv);
 	vec4 cb = texture2D(tDiffuse, vUv - offset);
-	gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
+	float c = ( cr.r + cga.g + cb.b ) / 3.0;
+	gl_FragColor = vec4( vec3( c ), cga.a);
 }
