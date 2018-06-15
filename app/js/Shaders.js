@@ -45,14 +45,6 @@ var Shaders = {
 		vertexShader: baseVs,
 		fragmentShader: require('./../shaders/noise.fs')
 	},
-	chromaticAberration : {
-		uniforms: {
-			'tDiffuse': { value: null },
-			'time':    { value: 1.0 }
-		},
-		vertexShader: baseVs,
-		fragmentShader: require('./../shaders/chromaticAberration.fs')
-	},
 	gray : {
 		uniforms: {
 			'tDiffuse': { value: null }

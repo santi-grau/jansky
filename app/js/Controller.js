@@ -6,9 +6,8 @@ var Gsap = require('gsap');
 var Controller = function( bpms ){
 	this.time = 0;
 	this.timeInc = 0.1;
-	this.bpms = bpms;
 
-	this.reset();
+	this.reset( bpms );
 	
 	this.beatLinear = 0;
 	this.barLinear = 0;
@@ -32,7 +31,8 @@ var Controller = function( bpms ){
 
 inherits( Controller, EventEmitter );
 
-Controller.prototype.reset = function(){
+Controller.prototype.reset = function( bpms ){
+	this.bpms = 60 / bpms * 1000;
 	if( this.beatInterval ) clearInterval( this.beatInterval );
 	this.beatInterval = setInterval( this.beat.bind( this ), this.bpms );
 	this.beats = 0;

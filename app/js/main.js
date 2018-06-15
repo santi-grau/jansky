@@ -2,6 +2,7 @@ var data = require('./data.json');
 window.THREE = require('three');
 var EffectComposer = require('three-effectcomposer')(THREE);
 
+var DragFile = require('./DragFile');
 var Controller = require('./Controller');
 var Body = require('./Body');
 var Composer = require('./COmposer');
@@ -9,22 +10,22 @@ var Composer = require('./COmposer');
 var Main = function( ) {
 	this.node = document.getElementById('main');
 
-	this.currentTrack = 1;
+	this.data = data;
+
+	this.currentTrack = 0;
 
 	this.scene = new THREE.Scene();
 	this.camera = new THREE.OrthographicCamera();
 	this.renderer = new THREE.WebGLRenderer( { alpha : false, antialias : true } );
 	this.node.appendChild( this.renderer.domElement );
 
-	var bpms = 60 / data[ this.currentTrack ].bpm * 1000;
-	this.controller = new Controller( bpms );
+	this.dragFile = new DragFile();
+	this.dragFile.on( 'data', this.updateData.bind( this ) );
 
-	this.body = new Body( this.controller, { fontSize : 13, word : data[this.currentTrack].song } );
+	this.controller = new Controller( this.data[ this.currentTrack ].bpm );
+
+	this.body = new Body( this.controller, { fontSize : 13, word : this.data[this.currentTrack].song } );
 	this.scene.add( this.body );
-
-	// this.body2 = new Body( this.controller, { fontSize : 13, word : data[0].song } );
-	// this.body2.scale.set(3,3,1)
-	// this.scene.add( this.body2 );
 
 	// Composer
 	var renderTarget = new THREE.WebGLRenderTarget( this.node.offsetWidth * 2, this.node.offsetHeight * 2, { depthBuffer : false, stencilBuffer : false } );
@@ -38,9 +39,32 @@ var Main = function( ) {
 	this.step();
 }
 
+Main.prototype.updateData = function( e ){
+	this.data = e;
+	this.updateTrack();
+}
+
+Main.prototype.updateTrack = function( track ){
+	this.controller.reset( this.data[ this.currentTrack ].bpm );
+	this.body.updateWord( this.data[ this.currentTrack ].song );
+}
+
 Main.prototype.keyDown = function( e ){
-	if( e.keyCode == 37 ) this.body.prevWord(); // left
-	if( e.keyCode == 39 ) this.body.nextWord(); // right
+	if( e.keyCode == 32 ) this.controller.reset( data[ this.currentTrack ].bpm ); // space
+	if( e.keyCode == 37 ) this.prevWord(); // left
+	if( e.keyCode == 39 ) this.nextWord(); // right
+}
+
+Main.prototype.prevWord = function(){
+	if( this.currentTrack == 0 ) return;
+	this.currentTrack--;
+	this.updateTrack();
+}
+
+Main.prototype.nextWord = function(){
+	if( this.currentTrack == data.length - 1 ) return;
+	this.currentTrack++;
+	this.updateTrack();
 }
 
 Main.prototype.resize = function( e ) {
@@ -54,7 +78,6 @@ Main.prototype.resize = function( e ) {
 	this.camera.updateProjectionMatrix( );
 
 	this.body.resize( width, height );
-	// this.body2.resize( width, height );
 }
 
 Main.prototype.step = function( time ) {
@@ -62,8 +85,6 @@ Main.prototype.step = function( time ) {
 
 	this.controller.step( time );
 	this.body.step( time , this.renderer );
-
-	// this.body2.step( time , this.renderer );
 	
 	this.composer.step( time );
 	this.composer.render()

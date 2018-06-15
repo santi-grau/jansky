@@ -13,21 +13,21 @@ body
 		position fixed
 		width 100%
 		height 100%
-	#input
-		display none
+	#drop
+		font-family monospace
+		font-size 10px
 		position fixed
 		top 0
 		left 0
 		width 100%
 		height 100%
 		z-index 2
-		margin 0
-		border 0
-		color #ffffff
-		background rgba(0,0,0,0.6)
-		width 100%
-		height 100%
-		font-size 34px
-		padding 20px
+		opacity 0
+		background #000000
+		color #ffff00
+		transition opacity 0.4s
+		text-align center
+		vertical-align middle
+		line-height 100vh
 		&.active
-			display block
+			opacity 0.8
