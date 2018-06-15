@@ -33,6 +33,7 @@ DragFile.prototype.handleDragOut = function( evt ){
 DragFile.prototype.handleFileSelect = function( evt ){
 	evt.stopPropagation();
 	evt.preventDefault();
+	this.drop.classList.remove('active');
 
 	var files = evt.dataTransfer.files;
 	
