@@ -17,6 +17,9 @@ var Controller = function( bpms ){
 	this.alternate = 0;
 
 	this.beatPeak = 0;
+	this.shortBeat = 0;
+
+	this.barPeak = 0;
 
 	this.noiseHigh = 0;
 	this.noiseMid = 0;
@@ -48,6 +51,10 @@ Controller.prototype.beat = function( ){
 	tl.to( this, bpmInterval * 0.1, { beatPeak : 1 } )
 	.to( this, bpmInterval * 0.9, { beatPeak : 0 } );
 
+	var tl = new TimelineLite();
+	tl.to( this, bpmInterval * 0.1, { shortBeat : 1 } )
+	.to( this, bpmInterval * 0.5, { shortBeat : 0 } );
+
 	var tl2 = new TimelineLite();
 	tl2.fromTo( this, bpmInterval, { beatLinear : 0 }, { beatLinear : 1 } );
 
@@ -70,6 +77,10 @@ Controller.prototype.bar = function( ){
 	bpmInterval *= 4;
 	var tl = new TimelineLite();
 	tl.fromTo( this, bpmInterval, { barLinear : 0 }, { barLinear : 1 } );
+
+	var tl = new TimelineLite();
+	tl.to( this, bpmInterval * 0.05, { barPeak : 1 } )
+	.to( this, bpmInterval * 0.15, { barPeak : 0 } );
 }
 
 Controller.prototype.fourbar = function( ){

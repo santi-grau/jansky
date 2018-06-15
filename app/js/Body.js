@@ -13,11 +13,13 @@ var Body = function( controller, settings ){
 	this.controller.on( 'bar', this.bar.bind( this ) );
 	this.controller.on( 'fourbar', this.fourbar.bind( this ) );
 
+
 	this.settings = settings || {};
 
 	this.simplex = new SimplexNoise( Math.random );
 
 	this.rotationStatus = new THREE.Vector3( Math.round( Math.random() ) * 2 - 1 , Boolean( Math.round( Math.random() ) ), Math.floor( Math.random() * 3 ) ); // direction, active, type --> 0 Beat | 1 bar | 4 fourbar
+	this.wordStatus = Math.random();
 
 	this.track = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 ); // value, divisor, count, mode -> 0 fluid | 1 step | 2 random
 	this.height = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 );
@@ -74,10 +76,8 @@ Body.prototype.bar = function( ){
 }
 
 Body.prototype.fourbar = function( ){
-
-
 	this.rotationStatus = new THREE.Vector3( Math.round( Math.random() ) * 2 - 1 , Boolean( Math.round( Math.random() ) ), Math.floor( Math.random() * 3 ) ); // direction, active, type --> 0 Beat | 1 bar | 4 fourbar
-
+	this.wordStatus = Math.random();
 	if( this.rotationStatus.y && this.rotationStatus.z == 2 ) TweenLite.to( this.rotation, this.controller.bpms / 1000 * 15.99999, { z : this.rotation.z + Math.PI * 2 * this.rotationStatus.x, ease : Power0.easeNone });
 
 	if( this.track.w == 2 ) this.track.y = 50 + Math.random() * 450;
@@ -87,6 +87,7 @@ Body.prototype.fourbar = function( ){
 	this.track.w = Math.floor( Math.random() * 3 );
 	this.height.w = Math.floor( Math.random() * 3 );
 	this.offset.w = Math.floor( Math.random() * 3 );
+
 }
 
 Body.prototype.resize = function( width, height ){
@@ -113,13 +114,21 @@ Body.prototype.step = function( time, renderer ){
 	renderer.render( this.letters.scene, this.letters.camera, this.letters, true );
 	this.time += this.timeInc;
 
-	this.track.x = this.simplex.noise3D( 0.9, 0.3, this.track.z++ / this.track.y );
-	this.height.x = this.simplex.noise3D( 0.3, 0.2, this.height.z++ / this.height.y );
-	this.offset.x = this.simplex.noise3D( 0.1, 0.8, this.offset.z++ / this.offset.y );
+	this.track.x = this.simplex.noise3D( 0.9, 0.3, this.time / this.track.y );
+	this.height.x = this.simplex.noise3D( 0.3, 0.2, this.time / this.height.y );
+	this.offset.x = this.simplex.noise3D( 0.1, 0.8, this.time / this.offset.y );
 
 	if( this.track.w == 0 ) this.letters.updateTrack( this.track.x );
 	if( this.height.w == 0 ) this.updateLineHeight( this.height.x );
 	if( this.offset.w == 0 ) this.updateLineOffset( this.offset.x );
+
+	var words = 8;
+	if( this.wordStatus > 0.8 ) words = 8 + Math.floor( this.controller.beatPeak * ( this.rows - this.rowCount ) );
+	
+	for( var h = 0 ; h < this.sides + 1 ; h++ ){
+		for( var i = 8 ; i < words ; i++ ) this.children[h].children[i].visible = true;
+		for( var i = words ; i < this.rows ; i++ ) this.children[h].children[i].visible = false;
+	}
 }
 
 module.exports = Body;

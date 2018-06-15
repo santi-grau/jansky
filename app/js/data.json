@@ -1,7 +1,11 @@
 [
 	{
+		"song" : "ÉSSER ELÈCTRIC",
+		"bpm" : 125
+	},
+	{
 		"song" : "MUSTELA MUSTELA",
-		"bpm" : 127
+		"bpm" : 100
 	},
 	{
 		"song" : "PALPENTES",
@@ -18,10 +22,6 @@
 	{
 		"song" : "GENETS",
 		"bpm" : 115
-	},
-	{
-		"song" : "ÉSSER ELÈCTRIC",
-		"bpm" : 125
 	},
 	{
 		"song" : "COMMEDIA",
