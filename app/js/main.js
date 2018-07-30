@@ -1,16 +1,21 @@
 var data = require('./data.json');
 window.THREE = require('three');
-var EffectComposer = require('three-effectcomposer')(THREE);
 
 var DragFile = require('./DragFile');
 var Controller = require('./Controller');
 var Body = require('./Body');
-var Composer = require('./COmposer');
+var Composer = require('./Composer');
 
 var Main = function( ) {
 	this.node = document.getElementById('main');
 
 	this.data = data;
+
+	this.settings = {
+		scale : 2
+	}
+
+	if(window.location.hash) this.settings.scale = 1;
 
 	this.currentTrack = 0;
 
@@ -28,7 +33,7 @@ var Main = function( ) {
 	this.scene.add( this.body );
 
 	// Composer
-	var renderTarget = new THREE.WebGLRenderTarget( this.node.offsetWidth * 2, this.node.offsetHeight * 2, { depthBuffer : false, stencilBuffer : false } );
+	var renderTarget = new THREE.WebGLRenderTarget( this.node.offsetWidth * this.settings.scale, this.node.offsetHeight * this.settings.scale, { depthBuffer : false, stencilBuffer : false } );
 
 	this.composer = new Composer( this.renderer, renderTarget, this.scene, this.camera, this.controller, this.node );
 
@@ -73,7 +78,7 @@ Main.prototype.resize = function( e ) {
 	var camView = { left :  width / -2, right : width / 2, top : height / 2, bottom : height / -2 };
 	for ( var prop in camView) this.camera[ prop ] = camView[ prop ];
 	this.camera.position.z = 1000;	
-	this.renderer.setSize( width * 2, height * 2 );
+	this.renderer.setSize( width * this.settings.scale, height * this.settings.scale );
 	this.renderer.domElement.setAttribute( 'style', 'width:' + width + 'px; height:' + height + 'px;' );
 	this.camera.updateProjectionMatrix( );
 
