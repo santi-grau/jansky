@@ -91,7 +91,6 @@ Main.prototype.step = function( time ) {
 	this.controller.step( time );
 	this.body.step( time , this.renderer );
 	
-	if( window.location.hash ) return this.renderer.render( this.scene, this.camera );
 	this.composer.step( time );
 	this.composer.render()
 };
