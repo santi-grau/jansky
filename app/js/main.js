@@ -15,7 +15,7 @@ var Main = function( ) {
 		scale : 2
 	}
 
-	if(window.location.hash) this.settings.scale = 1;
+	if( window.location.hash ) this.settings.scale = 1;
 
 	this.currentTrack = 0;
 
@@ -91,6 +91,7 @@ Main.prototype.step = function( time ) {
 	this.controller.step( time );
 	this.body.step( time , this.renderer );
 	
+	if( window.location.hash ) return this.renderer.render( this.scene, this.camera );
 	this.composer.step( time );
 	this.composer.render()
 };
