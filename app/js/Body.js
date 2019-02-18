@@ -24,7 +24,7 @@ var Body = function( controller, settings ){
 	this.track = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 ); // value, divisor, count, mode -> 0 fluid | 1 step | 2 random
 	this.height = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 );
 	this.offset = new THREE.Vector4( 0, 50 + Math.random() * 450, 0, 0 );
-	
+	console.log( this.settings.word )
 	var width = document.body.offsetWidth;
 	var height = this.settings.fontSize;
 	this.letters = new Letters( width * 2, height * 4, { fontSize : this.settings.fontSize } ); // THREE.WebGLRenderTarget
